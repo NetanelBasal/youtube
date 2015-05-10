@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Youtube</title>
+    <meta name="description" content="">
+    <!-- build:css app.min.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="libs/wait-me/dist/waitMe.min.css"/>
+    <!-- endbower -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="dist/main.css"/>
+    <!-- endbuild -->
+
+  </head>
+
+
+  <body ng-app="youtube" ng-cloak>
+
+
+    <div class="container">
+
+
+      <youtube>
+
+        <youtube-search></youtube-search>
+
+        <div class="row videos">
+          <youtube-list></youtube-list>
+          <youtube-video></youtube-video>
+        </div>
+
+      </youtube>
+
+    </div>
+
+
+
+    <!-- build:js app.min.js -->
+    <!-- bower:js -->
+    <script src="libs/jquery/dist/jquery.js"></script>
+    <script src="libs/angular/angular.js"></script>
+    <script src="libs/lodash/dist/lodash.compat.js"></script>
+    <script src="libs/wait-me/dist/waitMe.min.js"></script>
+    <!-- endbower -->
+
+    <script src="dist/main.js"></script>
+    <!-- endbuild -->
+
+  </body>
+</html>

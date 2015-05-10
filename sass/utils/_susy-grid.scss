@@ -1,0 +1,49 @@
+$col-nums: 12;
+
+$susy: (
+  columns: $col-nums,
+  gutters: 1/4,
+  gutter-position: inside,
+  flow: rtl,
+  container: 90%
+);
+
+.row {
+ @include clearfix();
+}
+
+@include border-box-sizing;
+
+[class*="c-"] {
+  @include gutters;
+  float: left;
+}
+
+.container {
+  @include container($container);
+}
+
+@for $i from 1 through $col-nums {
+  .c-#{$i} {
+     width: span($i of 12);
+  }
+}
+
+@for $i from 1 through 12 {
+  .c-md-#{$i} {
+    @include breakpoint($medium-range) {
+      width: span($i of 12);
+    }
+  }
+}
+
+@for $i from 1 through 12 {
+  .c-sm-#{$i} {
+    @include breakpoint($small-range) {
+      width: span($i of 12);
+    }
+  }
+}
+
+
+

@@ -1,0 +1,9 @@
+<section class="col-sm-7" wait-me shape="ios" text="loading">
+
+  <div ng-if="youtubeFactory.getVideo()">
+    <iframe ng-src="{{trustSrc(youtubeFactory.getVideo().src)}}" frameborder="0"></iframe>
+    <p style="margin-top: 20px;"><b>Currently playing</b>: {{youtubeFactory.getVideo().snippet.title}}</p>
+  </div>
+
+</section>
+

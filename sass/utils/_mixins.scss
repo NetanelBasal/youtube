@@ -1,0 +1,14 @@
+@mixin base-link() {
+    color: map_get($base-link, color);
+    &:hover {
+        background: map_get($base-link, hover);
+    }
+
+    &:focus {
+        background: map_get($base-link, focus);
+    }
+
+    &:active {
+        background: map_get($base-link, active);
+    }
+}

@@ -1,0 +1,16 @@
+<div class="col-sm-5 videos-list">
+
+  <p ng-if="!youtubeFactory.getVideos().length">No Videos</p>
+
+  <div class="media" ng-repeat="video in youtubeFactory.getVideos()">
+    <div class="media-left">
+      <img ng-src="{{video.snippet.thumbnails.default.url}}" alt=""/>
+    </div>
+    <div class="media-body">
+      <button class="btn btn-info pull-right" ng-click="setVideo(video)">Play</button>
+      <h4 class="media-heading">{{video.snippet.title}}</h4>
+      <p>{{video.snippet.description}}</p>
+    </div>
+  </div>
+
+</div>
