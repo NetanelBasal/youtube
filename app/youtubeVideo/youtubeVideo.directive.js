@@ -11,10 +11,19 @@ export default ( app ) => {
 
       scope.youtubeFactory = youtubeFactory;
 
+      /**
+       *
+       * @param src
+       * @returns {*}
+       */
       scope.trustSrc = function( src ) {
         return $sce.trustAsResourceUrl(src);
       }
 
+      /**
+       * When the video change need to show loading icon
+       * and when the iframe finish to load remove the icon
+       */
       scope.$watch(() => {
         return youtubeFactory.getVideo();
       }, ( newVal ) => {

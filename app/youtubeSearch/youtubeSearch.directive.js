@@ -1,20 +1,25 @@
-export default (app) => {
+export default ( app ) => {
   // @ngInject
-  app.directive('youtubeSearch', () => {
+  app.directive('youtubeSearch', ( youtubeFactory ) => {
     return {
-      require: '^youtube',
       templateUrl: 'app/youtubeSearch/views/youtubeSearch.tpl.html',
-      scope: {},
-      link: link
+      scope      : {},
+      link       : link
     };
 
-    function link(scope, elem, attr, ctrl) {
+    function link( scope ) {
 
+      let query;
+
+      /**
+       * Search video
+       */
       scope.searchVideos = function() {
-        if(scope.search) {
+        if( scope.search && scope.search !== query ) {
+          query = scope.search;
           scope.searchEmpty = false;
-          ctrl.searchVideos(scope.search);
-        } else {
+          youtubeFactory.searchVideos(scope.search);
+        } else if( !scope.search ) {
           scope.searchEmpty = true;
         }
       }

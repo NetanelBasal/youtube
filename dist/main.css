@@ -672,3 +672,9 @@ body {
 
 .videos {
   margin-top: 30px; }
+
+.active {
+  background: #eeeeee; }
+
+.likes {
+  padding: 10px; }

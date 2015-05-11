@@ -19,7 +19,7 @@
   require("./youtubeVideo")(app);
 })();
 
-},{"./common/wait-me":2,"./config":3,"./config/config.index":4,"./config/run.phase.js":5,"./modules":6,"./services/services.index":7,"./youtube":9,"./youtubeList":12,"./youtubeSearch":14,"./youtubeVideo":16}],2:[function(require,module,exports){
+},{"./common/wait-me":2,"./config":3,"./config/config.index":4,"./config/run.phase.js":5,"./modules":6,"./services/services.index":7,"./youtube":9,"./youtubeList":11,"./youtubeSearch":13,"./youtubeVideo":15}],2:[function(require,module,exports){
 "use strict";
 
 (function () {
@@ -106,10 +106,15 @@ module.exports = youtubeFactory;
 function youtubeFactory($http) {
   var URL_API = "https://www.googleapis.com/youtube/v3/search";
   var YOUTUBE_URL = "http://www.youtube.com/embed/";
+  var VIDEO_API = "https://www.googleapis.com/youtube/v3/videos";
   var API_KEY = "AIzaSyBsobUXzJvjjuHZsMiv7SZAkzVcSgc8F2c";
   var _videos = [];
   var _video = null;
 
+  /**
+   *
+   * @param query
+   */
   function searchVideos(query) {
     $http.get(URL_API, {
       params: {
@@ -121,26 +126,71 @@ function youtubeFactory($http) {
       }
     }).then(function (res) {
       var videos = res.data.items;
-      setVideos(videos);
-      setVideo(videos[0]);
+      setVideos(videos, function () {
+        setVideo(getVideos()[0]);
+      });
     });
   }
 
+  /**
+   *
+   * @returns {Array}
+   */
   function getVideos() {
     return _videos;
   }
 
-  function setVideos(videos) {
-    _videos = videos;
+  /**
+   * Not all the videos have videoID so i need to filter
+   * to not get an error or an empty screen
+   * @param videos
+   * @param cb
+   */
+  function setVideos(videos, cb) {
+    _videos = videos.filter(function (video) {
+      return video.id;
+    });
+    cb();
   }
 
+  /**
+   *
+   * @returns {*}
+   */
   function getVideo() {
     return _video;
   }
 
+  /**
+   *
+   * @param video
+   */
   function setVideo(video) {
+    getVideos().forEach(function (video) {
+      video.active = false;
+    });
+    video.active = true;
     video.src = YOUTUBE_URL + video.id.videoId;
     _video = video;
+  }
+
+  /**
+   *
+   * @param video
+   */
+  function getVotes(video) {
+    if (video.statistics) {
+      return;
+    }$http.get(VIDEO_API, {
+      params: {
+        id: video.id.videoId,
+        part: "statistics",
+        fields: "items/statistics/likeCount,items/statistics/dislikeCount",
+        key: API_KEY
+      }
+    }).then(function (res) {
+      video.statistics = res.data.items[0].statistics;
+    });
   }
 
   return {
@@ -148,7 +198,8 @@ function youtubeFactory($http) {
     setVideos: setVideos,
     getVideo: getVideo,
     setVideo: setVideo,
-    searchVideos: searchVideos
+    searchVideos: searchVideos,
+    getVotes: getVotes
   };
 }
 
@@ -156,52 +207,10 @@ function youtubeFactory($http) {
 "use strict";
 
 module.exports = function (app) {
-  require("./youtube.controller")(app);
   require("./youtube.directive")(app);
 };
 
-},{"./youtube.controller":10,"./youtube.directive":11}],10:[function(require,module,exports){
-"use strict";
-
-var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-module.exports = function (app) {
-  app.controller("YoutubeController", YoutubeController);
-};
-
-var YoutubeController = (function () {
-  //@ngInject
-  function YoutubeController(youtubeFactory) {
-    _classCallCheck(this, YoutubeController);
-
-    this.youtubeFactory = youtubeFactory;
-  }
-  YoutubeController.$inject = ["youtubeFactory"];
-  YoutubeController.$inject = ["youtubeFactory"];
-
-  _prototypeProperties(YoutubeController, null, {
-    searchVideos: {
-      value: function searchVideos(query) {
-        this.youtubeFactory.searchVideos(query);
-      },
-      writable: true,
-      configurable: true
-    },
-    setVideo: {
-      value: function setVideo(video) {
-        this.youtubeFactory.setVideo(video);
-      },
-      writable: true,
-      configurable: true
-    }
-  });
-
-  return YoutubeController;
-})();
-
-},{}],11:[function(require,module,exports){
+},{"./youtube.directive":10}],10:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -210,25 +219,19 @@ module.exports = function (app) {
     return {
       templateUrl: "app/youtube/views/youtube.tpl.html",
       scope: {},
-      transclude: true,
-      controller: "YoutubeController as vm",
-      link: link
+      transclude: true
     };
-
-    function link(scope, elem, attr) {
-      console.log("Im in youtube");
-    }
   });
 };
 
-},{}],12:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
   require("./youtubeList.directive")(app);
 };
 
-},{"./youtubeList.directive":13}],13:[function(require,module,exports){
+},{"./youtubeList.directive":12}],12:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -236,62 +239,78 @@ module.exports = function (app) {
   app.directive("youtubeList", ["youtubeFactory", function (youtubeFactory) {
     return {
       templateUrl: "app/youtubeList/views/youtubeList.tpl.html",
-      require: "^youtube",
       scope: {},
       link: link
     };
 
-    function link(scope, ele, attr, ctrl) {
+    function link(scope) {
       scope.youtubeFactory = youtubeFactory;
 
+      /**
+       * Set the video
+       * @param video
+       */
       scope.setVideo = function (video) {
-        ctrl.setVideo(video);
+        scope.youtubeFactory.setVideo(video);
+      };
+
+      /**
+       * Get video votes
+       * @param video
+       */
+      scope.getVotes = function (video) {
+        scope.youtubeFactory.getVotes(video);
       };
     }
   }]);
 };
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
   require("./youtubeSearch.directive")(app);
 };
 
-},{"./youtubeSearch.directive":15}],15:[function(require,module,exports){
+},{"./youtubeSearch.directive":14}],14:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
   // @ngInject
-  app.directive("youtubeSearch", function () {
+  app.directive("youtubeSearch", ["youtubeFactory", function (youtubeFactory) {
     return {
-      require: "^youtube",
       templateUrl: "app/youtubeSearch/views/youtubeSearch.tpl.html",
       scope: {},
       link: link
     };
 
-    function link(scope, elem, attr, ctrl) {
+    function link(scope) {
+      var query = undefined;
+
+      /**
+       * Search video
+       */
       scope.searchVideos = function () {
-        if (scope.search) {
+        if (scope.search && scope.search !== query) {
+          query = scope.search;
           scope.searchEmpty = false;
-          ctrl.searchVideos(scope.search);
-        } else {
+          youtubeFactory.searchVideos(scope.search);
+        } else if (!scope.search) {
           scope.searchEmpty = true;
         }
       };
     }
-  });
+  }]);
 };
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
   require("./youtubeVideo.directive")(app);
 };
 
-},{"./youtubeVideo.directive":17}],17:[function(require,module,exports){
+},{"./youtubeVideo.directive":16}],16:[function(require,module,exports){
 "use strict";
 
 module.exports = function (app) {
@@ -306,10 +325,19 @@ module.exports = function (app) {
     function link(scope, el) {
       scope.youtubeFactory = youtubeFactory;
 
+      /**
+       *
+       * @param src
+       * @returns {*}
+       */
       scope.trustSrc = function (src) {
         return $sce.trustAsResourceUrl(src);
       };
 
+      /**
+       * When the video change need to show loading icon
+       * and when the iframe finish to load remove the icon
+       */
       scope.$watch(function () {
         return youtubeFactory.getVideo();
       }, function (newVal) {

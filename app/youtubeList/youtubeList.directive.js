@@ -3,17 +3,28 @@ export default ( app ) => {
   app.directive('youtubeList', ( youtubeFactory ) => {
     return {
       templateUrl: 'app/youtubeList/views/youtubeList.tpl.html',
-      require: '^youtube',
       scope      : {},
       link       : link
     };
 
-    function link( scope, ele, attr, ctrl ) {
+    function link( scope ) {
 
       scope.youtubeFactory = youtubeFactory;
 
+      /**
+       * Set the video
+       * @param video
+       */
       scope.setVideo = ( video ) => {
-        ctrl.setVideo(video);
+        scope.youtubeFactory.setVideo(video);
+      }
+
+      /**
+       * Get video votes
+       * @param video
+       */
+      scope.getVotes = ( video ) => {
+        scope.youtubeFactory.getVotes(video);
       }
     }
 
