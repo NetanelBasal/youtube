@@ -1,9 +1,8 @@
 FROM node:0.12.7
-RUN npm install bower -g
-RUN npm install http-server -g
-RUN bower install
-RUN npm install
+ADD package.json $APP_HOME/
+RUN npm install bower
+RUN npm install http-server
 
-ENV PORT 8080
-EXPOSE 8080
-CMD http-server -p 8080
+RUN npm start
+
+EXPOSE 80
