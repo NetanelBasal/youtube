@@ -3,6 +3,6 @@ ADD package.json $APP_HOME/
 RUN npm install bower
 RUN npm install http-server
 
-RUN npm start
-
 EXPOSE 80
+CMD npm start
+
