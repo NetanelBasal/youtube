@@ -1,4 +1,5 @@
 FROM node:0.12.7
+RUN bower install -g
 RUN npm install http-server -g
 RUN bower install
 RUN npm install
