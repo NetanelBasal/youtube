@@ -5,7 +5,7 @@ ADD package.json $APP_HOME/
 WORKDIR $APP_HOME
 RUN npm install bower
 RUN npm install http-server
-RUN bower install
+
 ADD . $APP_HOME
 
 EXPOSE 80
